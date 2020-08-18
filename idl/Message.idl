@@ -1,0 +1,7 @@
+module Example {
+
+  @topic
+  struct Message {
+    string text;
+  };
+};
