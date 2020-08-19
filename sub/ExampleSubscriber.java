@@ -3,14 +3,9 @@ import OpenDDS.DCPS.*;
 import org.omg.CORBA.StringSeqHolder;
 import Example.*;
 
-public class ExamplePublisher {
+public class ExampleSubscriber {
 
   public static void main(String[] args) {
-
-    if (args.length < 1) {
-      System.err.println("ERROR: provide the message text as a command line argument");
-      return;
-    }
 
     DomainParticipantFactory dpf = TheParticipantFactory.WithArgs(new StringSeqHolder(args));
     if (dpf == null) {
@@ -36,34 +31,27 @@ public class ExamplePublisher {
       return;
     }
 
-    Publisher pub = dp.create_publisher(PUBLISHER_QOS_DEFAULT.get(), null, DEFAULT_STATUS_MASK.value);
-    if (pub == null) {
-      System.err.println("ERROR: Publisher creation failed");
+    Subscriber sub = dp.create_subscriber(SUBSCRIBER_QOS_DEFAULT.get(), null, DEFAULT_STATUS_MASK.value);
+    if (sub == null) {
+      System.err.println("ERROR: Subscriber creation failed");
       return;
     }
 
-    DataWriterQos dw_qos = DATAWRITER_QOS_DEFAULT.get();
-    DataWriterQosHolder qos_holder = new DataWriterQosHolder(dw_qos);
-    pub.get_default_datawriter_qos(qos_holder);
-    dw_qos = qos_holder.value;
-    dw_qos.durability.kind = DurabilityQosPolicyKind.TRANSIENT_LOCAL_DURABILITY_QOS;
+    DataReaderQos dr_qos = DATAREADER_QOS_DEFAULT.get();
+    DataReaderQosHolder qos_holder = new DataReaderQosHolder(dr_qos);
+    sub.get_default_datareader_qos(qos_holder);
+    dr_qos = qos_holder.value;
+    dr_qos.durability.kind = DurabilityQosPolicyKind.TRANSIENT_LOCAL_DURABILITY_QOS;
+    dr_qos.reliability.kind = ReliabilityQosPolicyKind.RELIABLE_RELIABILITY_QOS;
 
-    DataWriter dw = pub.create_datawriter(top, dw_qos, null, DEFAULT_STATUS_MASK.value);
-    if (dw == null) {
-      System.err.println("ERROR: DataWriter creation failed");
+    DataReader dr = sub.create_datareader(top, dr_qos, new ExampleListener(), DEFAULT_STATUS_MASK.value);
+    if (dr == null) {
+      System.err.println("ERROR: DataReader creation failed");
       return;
     }
-
-    MessageDataWriter mdw = MessageDataWriterHelper.narrow(dw);
-    Message msg = new Message(args[0]);
-    int ret = mdw.write(msg, HANDLE_NIL.value);
-    if (ret != RETCODE_OK.value) {
-      System.err.println("ERROR write() returned " + ret);
-    }
-    System.out.println("wrote: " + msg.text);
 
     try {
-      Thread.sleep(5 * 1000);
+      Thread.sleep(60 * 1000);
     } catch(InterruptedException ie) {
     }
 
