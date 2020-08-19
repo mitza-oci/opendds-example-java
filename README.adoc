@@ -1,0 +1,33 @@
+= An OpenDDS Java Example
+
+== Dev Environment Setup
+
+See: https://opendds.org/quickstart/GettingStartedLinux.html[Getting Started - Linux / macOS]
+
+. `curl -O http://download.ociweb.com/OpenDDS/OpenDDS-3.14.tar.gz`
+. `tar xzf OpenDDS-3.14.tar.gz`
+. `cd OpenDDS-3.14`
+. `./configure --java`
+. `make`
+
+== Building IDL
+
+. `source /your/path/to/OpenDDS-3.14/setenv.sh` -- From OpenDDS folder above
+. `cd idl`
+. `./build.sh`
+
+== Build / Start Subscriber
+
+. `cd sub`
+. `./build.sh`
+. `./run.sh`
+
+It will run for a minute and print any messages received during that time.
+
+== Build / Start Publisher
+
+. `cd pub`
+. `./build.sh`
+. `./run.sh Hello`
+
+It will send the message from the command line argument (in this example, Hello) to the subscring process.
