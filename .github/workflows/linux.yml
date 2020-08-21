@@ -1,0 +1,48 @@
+name: linux
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '0 7 * * SUN'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-18.04
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }}
+    steps:
+      - name: Checkout this repository
+        uses: actions/checkout@v2
+      - name: Checkout OpenDDS
+        uses: actions/checkout@v2
+        with:
+          repository: objectcomputing/OpenDDS
+          path: OpenDDS
+          ref: latest-release
+      - name: Configure OpenDDS
+        run: |
+          cd OpenDDS
+          ./configure -v --java --mpcopts="-workers 4"
+          tools/scripts/show_build_config.pl
+      - name: Compile OpenDDS
+        run: |
+          make -C OpenDDS -sj6
+      - name: Compile Project IDL
+        run: |
+          . OpenDDS/setenv.sh
+          cd idl
+          ./build.sh
+      - name: Compile Publisher
+        run: |
+          . OpenDDS/setenv.sh
+          cd pub
+          ./build.sh
+      - name: Compile Subscriber
+        run: |
+          . OpenDDS/setenv.sh
+          cd sub
+          ./build.sh
