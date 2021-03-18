@@ -1,0 +1,64 @@
+name: windows
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '0 7 * * SUN'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: windows-2019
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: cmd
+    steps:
+      - name: Checkout this repository
+        uses: actions/checkout@v2
+      - name: Checkout OpenDDS
+        uses: actions/checkout@v2
+        with:
+          repository: objectcomputing/OpenDDS
+          path: OpenDDS
+          ref: latest-release
+      - name: Get xerces-c from vcpkg
+        uses: lukka/run-vcpkg@v6
+        with:
+          vcpkgGitCommitId: ec6fe06e8da05a8157dc8581fa96b36b571c1bd5
+          vcpkgArguments: --recurse xerces-c
+          vcpkgTriplet: x64-windows
+      - name: set up msvc env
+        uses: ilammy/msvc-dev-cmd@v1.6.0
+      - name: Configure OpenDDS
+        run: |
+          cd OpenDDS
+          call configure -v --java --mpcopts="-workers 4" --xerces3=%VCPKG_ROOT%\installed\x64-windows
+          tools\scripts\show_build_config.pl
+      - name: Compile OpenDDS
+        run: |
+          cd OpenDDS
+          call setenv
+          msbuild -p:Configuration=Debug,Platform=x64 -m DDS_TAOv2.sln
+      - name: Compile Project IDL
+        if: false
+        run: |
+          . OpenDDS/setenv.sh
+          cd idl
+          ./build.sh
+      - name: Compile Publisher
+        if: false
+        run: |
+          . OpenDDS/setenv.sh
+          cd pub
+          ./build.sh
+      - name: Compile Subscriber
+        if: false
+        run: |
+          . OpenDDS/setenv.sh
+          cd sub
+          ./build.sh
