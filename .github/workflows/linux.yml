@@ -26,7 +26,7 @@ jobs:
       - name: Get OpenDDS git commit
         run: |
           echo OPENDDS_COMMIT=$(cd OpenDDS; git rev-parse HEAD) >> $GITHUB_ENV
-      - name Cache OpenDDS
+      - name: Cache OpenDDS
         id: cache-artifact
         uses: actions/cache@v2.1.4
         with:
