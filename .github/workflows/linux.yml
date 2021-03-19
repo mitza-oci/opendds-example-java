@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-18.04
+          - os: [ubuntu-18.04, ubuntu-20.04]
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}
     steps:
@@ -23,12 +23,23 @@ jobs:
           repository: objectcomputing/OpenDDS
           path: OpenDDS
           ref: latest-release
+      - name: Get OpenDDS git commit
+        run: |
+          echo OPENDDS_COMMIT=$(cd OpenDDS; git rev-parse HEAD) >> $GITHUB_ENV
+      - name Cache OpenDDS
+        id: cache-artifact
+        uses: actions/cache@v2.1.4
+        with:
+          path: OpenDDS
+          key: c01_${{ matrix.os }}_OpenDDS_${{ env.OPENDDS_COMMIT }}
       - name: Configure OpenDDS
+        if: steps.cache-artifact.outputs.cache-hit != 'true'
         run: |
           cd OpenDDS
           ./configure -v --java --mpcopts="-workers 4"
           tools/scripts/show_build_config.pl
       - name: Compile OpenDDS
+        if: steps.cache-artifact.outputs.cache-hit != 'true'
         run: |
           make -C OpenDDS -sj6
       - name: Compile Project IDL
