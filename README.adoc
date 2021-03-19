@@ -30,4 +30,4 @@ It will run for a minute and print any messages received during that time.
 . `./build.sh`
 . `./run.sh Hello`
 
-It will send the message from the command line argument (in this example, Hello) to the subscring process.
+It will send the message from the command line argument (in this example, Hello) to the subscribing process.
