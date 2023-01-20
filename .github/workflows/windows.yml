@@ -19,9 +19,9 @@ jobs:
         shell: cmd
     steps:
       - name: Checkout this repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Checkout OpenDDS
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: objectcomputing/OpenDDS
           path: OpenDDS
@@ -32,12 +32,12 @@ jobs:
           for /f %%x in ('git rev-parse HEAD') do @echo OPENDDS_COMMIT=%%x>> %GITHUB_ENV%
       - name: Cache OpenDDS
         id: cache-artifact
-        uses: actions/cache@v2.1.4
+        uses: actions/cache@v3
         with:
           path: OpenDDS
           key: c02_${{ matrix.os }}_OpenDDS_${{ env.OPENDDS_COMMIT }}
       - name: set up msvc env
-        uses: ilammy/msvc-dev-cmd@v1.6.0
+        uses: ilammy/msvc-dev-cmd@v1
       - name: Configure OpenDDS
         if: steps.cache-artifact.outputs.cache-hit != 'true'
         run: |
@@ -52,10 +52,9 @@ jobs:
           msbuild -p:Configuration=Debug,Platform=x64 -m DDS_TAOv2.sln
       - name: Compile Project IDL
         run: |
-          cd OpenDDS
-	  call setenv
-          cd ..\idl
-          call build
+          call OpenDDS\setenv
+          cd idl
+          call build-libs
       - name: Compile Publisher
         if: false
         run: |

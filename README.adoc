@@ -13,12 +13,12 @@ See: https://opendds.org/quickstart/GettingStartedLinux.html[Getting Started - L
 
 . `source /your/path/to/OpenDDS/setenv.sh` -- From OpenDDS folder above
 . `cd idl`
-. `./build.sh`
+. `./build-libs.sh`
 
 == Build / Start Subscriber
 
 . `cd sub`
-. `./build.sh`
+. `../build-app.sh`
 . `./run.sh`
 
 It will run for a minute and print any messages received during that time.
@@ -26,7 +26,7 @@ It will run for a minute and print any messages received during that time.
 == Build / Start Publisher
 
 . `cd pub`
-. `./build.sh`
+. `../build-app.sh`
 . `./run.sh Hello`
 
 It will send the message from the command line argument (in this example, Hello) to the subscribing process.

@@ -16,11 +16,11 @@ jobs:
     name: ${{ matrix.os }}
     steps:
       - name: Checkout this repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Checkout OpenDDS
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
-          repository: objectcomputing/OpenDDS
+          repository: OpenDDS/OpenDDS
           path: OpenDDS
           ref: latest-release
       - name: Get OpenDDS git commit
@@ -28,7 +28,7 @@ jobs:
           echo OPENDDS_COMMIT=$(cd OpenDDS; git rev-parse HEAD) >> $GITHUB_ENV
       - name: Cache OpenDDS
         id: cache-artifact
-        uses: actions/cache@v2.1.4
+        uses: actions/cache@v3
         with:
           path: OpenDDS
           key: c01_${{ matrix.os }}_OpenDDS_${{ env.OPENDDS_COMMIT }}
@@ -46,18 +46,16 @@ jobs:
         run: |
           . OpenDDS/setenv.sh
           cd idl
-          ./build.sh
-      - name: Compile Publisher
+          ./build-libs.sh
+      - name: Compile Publisher and Subscriber
         run: |
           . OpenDDS/setenv.sh
           cd pub
-          ./build.sh
-      - name: Compile Subscriber
-        run: |
-          . OpenDDS/setenv.sh
-          cd sub
-          ./build.sh
+          ../build-app.sh
+          cd ../sub
+          ../build-app.sh
       - name: Run Example
         run: |
+          PATH=$JAVA_HOME_17_X64/bin:$PATH
           (cd sub; ./run.sh) &
           (cd pub; ./run.sh Hello)
