@@ -4,15 +4,14 @@
 
 See: https://opendds.org/quickstart/GettingStartedLinux.html[Getting Started - Linux / macOS]
 
-. `curl -O http://download.ociweb.com/OpenDDS/OpenDDS-3.14.tar.gz`
-. `tar xzf OpenDDS-3.14.tar.gz`
-. `cd OpenDDS-3.14`
-. `./configure --java`
+. `git clone -b latest-release https://github.com/OpenDDS/OpenDDS`
+. `cd OpenDDS`
+. `./configure --java` (some systems require --java=<PATH_TO_JAVA>)
 . `make`
 
 == Building IDL
 
-. `source /your/path/to/OpenDDS-3.14/setenv.sh` -- From OpenDDS folder above
+. `source /your/path/to/OpenDDS/setenv.sh` -- From OpenDDS folder above
 . `cd idl`
 . `./build.sh`
 

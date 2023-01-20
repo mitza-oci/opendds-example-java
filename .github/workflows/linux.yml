@@ -10,7 +10,8 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-18.04, ubuntu-20.04]
+        include:
+          - os: ubuntu-22.04
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}
     steps:
@@ -56,3 +57,7 @@ jobs:
           . OpenDDS/setenv.sh
           cd sub
           ./build.sh
+      - name: Run Example
+        run: |
+          (cd sub; ./run.sh) &
+          (cd pub; ./run.sh Hello)
