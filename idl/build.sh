@@ -20,7 +20,7 @@ if [ `uname -s` = "Darwin" ]; then
 else
     LIB_EXT=so
     LIB_EXT_VERSIONED="$LIB_EXT.*"
-    SYMLINK_LIBS=OpenDDS_Rtps_Udp
+    SYMLINK_LIBS="OpenDDS_Rtps_Udp OpenDDS_DCPS_Java"
 fi
 
 mkdir libs
@@ -30,7 +30,7 @@ cp ../*.$LIB_EXT .
 cp $DDS_ROOT/lib/*.jar .
 
 OPENDDS_LIBS="OpenDDS_DCPS_Java idl2jni_runtime OpenDDS_Dcps OpenDDS_Rtps OpenDDS_Rtps_Udp"
-ACE_LIBS="TAO_AnyTypeCode TAO ACE"
+ACE_LIBS="TAO_Valuetype TAO_AnyTypeCode TAO ACE"
 
 for libname in $OPENDDS_LIBS; do
     cp $DDS_ROOT/lib/lib$libname.$LIB_EXT_VERSIONED .
