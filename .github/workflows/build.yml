@@ -25,7 +25,7 @@ jobs:
         include:
           - runner: macos-12
             java_option: =$JAVA_HOME_17_X64
-            path_prefix: '${{ env.JAVA_HOME_17_X64 }}/bin:'
+            java_home: $JAVA_HOME_17_X64
 
     runs-on: ${{ matrix.runner }}
 
@@ -107,7 +107,7 @@ jobs:
       - name: Run Example
         if: runner.os != 'Windows'
         env:
-          PATH: ${{ matrix.path_prefix }}${{ env.PATH }}
+          JAVA_HOME: ${{ matrix.java_home }}
         run: |
           (cd sub; ./run.sh) &
           (cd pub; ./run.sh Hello)

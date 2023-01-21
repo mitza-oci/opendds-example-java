@@ -3,5 +3,9 @@
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:../../idl/build/libs
 export DYLD_LIBRARY_PATH=${DYLD_LIBRARY_PATH}:../../idl/build/libs
 
+if [ "$JAVA_HOME" != "" ]; then
+    PREFIX=${JAVA_HOME}/bin/
+fi
+
 cd build
-java -cp ".:../../idl/build/libs/*" ExampleSubscriber "$@" -DCPSConfigFile ../../rtps.ini
+${PREFIX}java -cp ".:../../idl/build/libs/*" ExampleSubscriber "$@" -DCPSConfigFile ../../rtps.ini
