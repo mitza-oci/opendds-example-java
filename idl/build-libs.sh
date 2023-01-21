@@ -20,7 +20,7 @@ if [ `uname -s` = "Darwin" ]; then
 else
     LIB_EXT=so
     LIB_EXT_VERSIONED="$LIB_EXT.*"
-    SYMLINK_LIBS="OpenDDS_Rtps_Udp OpenDDS_DCPS_Java"
+    SYMLINK_LIBS="OpenDDS_Rtps_Udp OpenDDS_DCPS_Java idl2jni_runtime"
 fi
 
 mkdir libs
