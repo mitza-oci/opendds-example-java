@@ -25,7 +25,7 @@ jobs:
         include:
           - runner: macos-12
             java_option: =$JAVA_HOME_17_X64
-            path_prefix: '$JAVA_HOME_17_X64/bin:'
+            path_prefix: '${{ env.JAVA_HOME_17_X64 }}/bin:'
 
     runs-on: ${{ matrix.runner }}
 
@@ -54,6 +54,9 @@ jobs:
           cd OpenDDS
           ./configure -v --java${{ matrix.java_option }} --mpcopts="-workers 4"
           tools/scripts/show_build_config.pl
+      - name: Set up msvc env
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
       - name: Configure OpenDDS
         if: steps.cache-artifact.outputs.cache-hit != 'true' && runner.os == 'Windows'
         shell: cmd
@@ -93,10 +96,18 @@ jobs:
           ../build-app.sh
           cd ../sub
           ../build-app.sh
+      - name: Compile Publisher and Subscriber
+        if: runner.os == 'Windows'
+        run: |
+          call OpenDDS/setenv
+          cd pub
+          call ../build-app
+          cd ../sub
+          call ../build-app
       - name: Run Example
         if: runner.os != 'Windows'
         env:
-          PATH: ${{ matrix.path_prefix }}$PATH
+          PATH: ${{ matrix.path_prefix }}${{ env.PATH }}
         run: |
           (cd sub; ./run.sh) &
           (cd pub; ./run.sh Hello)
