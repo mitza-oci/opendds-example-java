@@ -98,6 +98,7 @@ jobs:
           ../build-app.sh
       - name: Compile Publisher and Subscriber
         if: runner.os == 'Windows'
+        shell: cmd
         run: |
           call OpenDDS/setenv
           cd pub
@@ -106,8 +107,7 @@ jobs:
           call ../build-app
       - name: Run Example
         if: runner.os != 'Windows'
-        env:
-          JAVA_HOME: ${{ matrix.java_home }}
         run: |
+          export JAVA_HOME=${{ matrix.java_home }}
           (cd sub; ./run.sh) &
           (cd pub; ./run.sh Hello)
