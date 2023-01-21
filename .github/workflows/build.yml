@@ -1,0 +1,102 @@
+---
+name: Build
+on:
+  pull_request:
+  push:
+  schedule:
+    - cron: '0 7 * * SUN'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        opendds_branch:
+          - master
+          - latest-release
+        runner:
+          - windows-2022
+          - ubuntu-22.04
+          - macos-12
+        include:
+          - runner: macos-12
+            java_option: =$JAVA_HOME_17_X64
+            path_prefix: '$JAVA_HOME_17_X64/bin:'
+
+    runs-on: ${{ matrix.runner }}
+
+    steps:
+      - name: Checkout this repo
+        uses: actions/checkout@v3
+      - name: Checkout OpenDDS
+        uses: actions/checkout@v3
+        with:
+          repository: OpenDDS/OpenDDS
+          path: OpenDDS
+          ref: ${{ matrix.opendds_branch }}
+          fetch-depth: 1
+      - name: Get OpenDDS commit
+        run: |
+          echo OPENDDS_COMMIT=$(cd OpenDDS; git rev-parse HEAD) >> $GITHUB_ENV
+      - name: Cache OpenDDS
+        id: cache-artifact
+        uses: actions/cache@v3
+        with:
+          path: OpenDDS
+          key: c01_${{ matrix.runner }}_OpenDDS_${{ env.OPENDDS_COMMIT }}
+      - name: Configure OpenDDS
+        if: steps.cache-artifact.outputs.cache-hit != 'true' && runner.os != 'Windows'
+        run: |
+          cd OpenDDS
+          ./configure -v --java${{ matrix.java_option }} --mpcopts="-workers 4"
+          tools/scripts/show_build_config.pl
+      - name: Configure OpenDDS
+        if: steps.cache-artifact.outputs.cache-hit != 'true' && runner.os == 'Windows'
+        shell: cmd
+        run: |
+          cd OpenDDS
+          call configure -v --java${{ matrix.java_option }} --mpcopts="-workers 4"
+          tools\scripts\show_build_config.pl
+      - name: Compile OpenDDS
+        if: steps.cache-artifact.outputs.cache-hit != 'true' && runner.os != 'Windows'
+        run: |
+          make -C OpenDDS -sj6
+      - name: Compile OpenDDS
+        if: steps.cache-artifact.outputs.cache-hit != 'true' && runner.os == 'Windows'
+        shell: cmd
+        run: |
+          cd OpenDDS
+          call setenv
+          msbuild -p:Configuration=Debug,Platform=x64 -m DDS_TAOv2.sln
+      - name: Compile Project IDL
+        if: runner.os != 'Windows'
+        run: |
+          . OpenDDS/setenv.sh
+          cd idl
+          ./build-libs.sh
+      - name: Compile Project IDL
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          call OpenDDS/setenv
+          cd idl
+          call build-libs
+      - name: Compile Publisher and Subscriber
+        if: runner.os != 'Windows'
+        run: |
+          . OpenDDS/setenv.sh
+          cd pub
+          ../build-app.sh
+          cd ../sub
+          ../build-app.sh
+      - name: Run Example
+        if: runner.os != 'Windows'
+        env:
+          PATH: ${{ matrix.path_prefix }}$PATH
+        run: |
+          (cd sub; ./run.sh) &
+          (cd pub; ./run.sh Hello)
