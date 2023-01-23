@@ -115,7 +115,9 @@ jobs:
           (cd pub; ./run.sh Hello)
       - name: Run Example
         if: runner.os == 'Windows'
+        shell: cmd
         run: |
           cd sub & start cmd /c/s "run > sub.log 2>&1" & cd ..
           cd pub & call run Hello & cd ..
+          waitfor /t 65 pause 2>NUL
           type sub\sub.log
