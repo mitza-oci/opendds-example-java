@@ -1,6 +1,5 @@
 @echo off
 setlocal
-set CONFIGURATION=Debug
 rmdir /s/q build 2>NUL
 mkdir build
 cd build
@@ -13,7 +12,7 @@ mkdir libs
 xcopy /q *.jar libs
 xcopy /q *.dll libs
 
-set OPENDDS_LIBS=OpenDDS_DCPS_Java idl2jni_runtime OpenDDS_Dcps OpenDDS_Rtps OpenDDS_Rtps_Udp
+set OPENDDS_LIBS=OpenDDS_DCPS_Java idl2jni_runtime OpenDDS_Dcps OpenDDS_Rtps OpenDDS_Rtps_Udp OpenDDS_Tcp OpenDDS_Udp
 set ACE_LIBS=TAO_Valuetype TAO_AnyTypeCode TAO ACE
 
 if %CONFIGURATION%==Debug set SUFFIX=d

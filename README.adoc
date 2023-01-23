@@ -3,13 +3,17 @@
 == Dev Environment Setup
 
 See: https://opendds.org/quickstart/GettingStartedLinux.html[Getting Started - Linux / macOS]
+or: https://opendds.org/quickstart/GettingStartedWindows.html[Getting Started - Windows]
 
 . `git clone -b latest-release https://github.com/OpenDDS/OpenDDS`
 . `cd OpenDDS`
 . `./configure --java` (some systems require --java=<PATH_TO_JAVA>)
-. `make`
+. `make` (for Windows see OpenDDS Getting Started linked above)
 
 == Building IDL
+
+The commands below can be directly used on Linux and macOS.  For Windows,
+replace the `.sh` scripts with the equivalent `.cmd` scripts.
 
 . `source /your/path/to/OpenDDS/setenv.sh` -- From OpenDDS folder above
 . `cd idl`

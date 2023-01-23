@@ -86,6 +86,8 @@ jobs:
         shell: cmd
         run: |
           call OpenDDS/setenv
+          set CONFIGURATION=Debug
+          echo CONFIGURATION=%CONFIGURATION%>> %GITHUB_ENV%
           cd idl
           call build-libs
       - name: Compile Publisher and Subscriber
@@ -111,3 +113,9 @@ jobs:
           export JAVA_HOME=${{ matrix.java_home }}
           (cd sub; ./run.sh) &
           (cd pub; ./run.sh Hello)
+      - name: Run Example
+        if: runner.os == 'Windows'
+        run: |
+          cd sub & start cmd /c/s "run > sub.log 2>&1" & cd ..
+          cd pub & call run Hello & cd ..
+          type sub\sub.log
