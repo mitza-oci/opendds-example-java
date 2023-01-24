@@ -22,10 +22,18 @@ jobs:
           - windows-2022
           - ubuntu-22.04
           - macos-12
+        configuration:
+          - Debug
         include:
           - runner: macos-12
             java_option: =$JAVA_HOME_17_X64
             java_home: $JAVA_HOME_17_X64
+          - runner: windows-2022
+            opendds_branch: master
+            configuration: Release
+          - runner: windows-2022
+            opendds_branch: latest-release
+            configuration: Release
 
     runs-on: ${{ matrix.runner }}
 
@@ -47,7 +55,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: OpenDDS
-          key: c01_${{ matrix.runner }}_OpenDDS_${{ env.OPENDDS_COMMIT }}
+          key: c01_${{ matrix.runner }}_OpenDDS_${{ env.OPENDDS_COMMIT }}${{ matrix.configuration }}
       - name: Configure OpenDDS
         if: steps.cache-artifact.outputs.cache-hit != 'true' && runner.os != 'Windows'
         run: |
@@ -72,9 +80,11 @@ jobs:
         if: steps.cache-artifact.outputs.cache-hit != 'true' && runner.os == 'Windows'
         shell: cmd
         run: |
+          set CONFIGURATION=${{ matrix.configuration }}
+          echo CONFIGURATION=%CONFIGURATION%>> %GITHUB_ENV%
           cd OpenDDS
           call setenv
-          msbuild -p:Configuration=Debug,Platform=x64 -m DDS_TAOv2.sln
+          msbuild -p:Configuration=%CONFIGURATION%,Platform=x64 -m DDS_TAOv2.sln
       - name: Compile Project IDL
         if: runner.os != 'Windows'
         run: |
@@ -86,8 +96,6 @@ jobs:
         shell: cmd
         run: |
           call OpenDDS/setenv
-          set CONFIGURATION=Debug
-          echo CONFIGURATION=%CONFIGURATION%>> %GITHUB_ENV%
           cd idl
           call build-libs
       - name: Compile Publisher and Subscriber
