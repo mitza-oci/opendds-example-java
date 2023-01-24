@@ -117,7 +117,11 @@ jobs:
         if: runner.os == 'Windows'
         shell: cmd
         run: |
+          echo ::notice::Start subscriber in background
           cd sub & start cmd /c/s "run > sub.log 2>&1" & cd ..
+          echo ::notice::Start publisher in foreground
           cd pub & call run Hello & cd ..
+          echo ::notice::Pause for subscriber to complete
           waitfor /t 65 pause 2>NUL
+          echo ::notice::Show subscriber log file
           type sub\sub.log
