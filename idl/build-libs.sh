@@ -10,7 +10,6 @@ mkdir build
 cd build
 ln -sf ../Message.idl .
 ln -sf ../Message.mpc .
-$ACE_ROOT/bin/generate_export_file.pl Message > Message_Export.h
 $ACE_ROOT/bin/mwc.pl -type gnuace
 make -sj4
 

@@ -1,8 +1,7 @@
 project(DDS*TypeSupport): dcps_java {
-  idlflags += -Wb,export_include=Message_Export.h -Wb,export_macro=Message_Export
-  dcps_ts_flags += -Wb,export_macro=Message_Export
-  idl2jniflags += -Wb,export_include=Message_Export.h -Wb,export_macro=Message_Export
-  dynamicflags += MESSAGE_BUILD_DLL
+  idlflags += -Wb,export_include=idl2jni_jni.h -Wb,export_macro=JNIEXPORT
+  dcps_ts_flags += -Wb,export_macro=JNIEXPORT
+  idl2jniflags += -Wb,export_include=idl2jni_jni.h -Wb,export_macro=JNIEXPORT
 
   specific {
     jarname = DDS_Message_TypeSupport
