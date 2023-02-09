@@ -28,6 +28,8 @@ jobs:
           - runner: macos-12
             java_option: =$JAVA_HOME_17_X64
             java_home: $JAVA_HOME_17_X64
+            config_options: |
+              --xerces3=$(brew --prefix xerces-c) --openssl=/usr/local/opt/openssl@1.1
           - runner: windows-2022
             opendds_branch: master
             configuration: Release
@@ -40,6 +42,28 @@ jobs:
     steps:
       - name: Checkout this repo
         uses: actions/checkout@v3
+      - name: Get dependencies from apt
+        if: runner.os == 'Linux'
+        run: |
+         sudo apt-get -y install libxerces-c-dev
+      - name: Get dependencies from homebrew
+        if: runner.os == 'macOS'
+        run: |
+         brew install xerces-c
+      - name: Prepare to use vcpkg
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          echo { "name": "opendds", "version-string": "github-actions", "dependencies": [ "openssl", "xerces-c" ] } > vcpkg.json
+          echo VCPKG_DEFAULT_TRIPLET=x64-windows>> %GITHUB_ENV%
+          echo VCPKG_INSTALLED_DIR=${{ github.workspace }}\vcpkg\installed>> %GITHUB_ENV%
+      - name: Get dependencies from vcpkg
+        if: runner.os == 'Windows'
+        uses: lukka/run-vcpkg@v10
+        with:
+          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+          vcpkgGitCommitId: 688ece714204fb5e9ad790ad9ad6d9f571d2b032
+          runVcpkgInstall: true
       - name: Checkout OpenDDS
         uses: actions/checkout@v3
         with:
@@ -55,12 +79,12 @@ jobs:
         uses: actions/cache@v3
         with:
           path: OpenDDS
-          key: c01_${{ matrix.runner }}_OpenDDS_${{ env.OPENDDS_COMMIT }}${{ matrix.configuration }}
+          key: c02_${{ matrix.runner }}_OpenDDS_${{ env.OPENDDS_COMMIT }}${{ matrix.configuration }}
       - name: Configure OpenDDS
         if: steps.cache-artifact.outputs.cache-hit != 'true' && runner.os != 'Windows'
         run: |
           cd OpenDDS
-          ./configure -v --java${{ matrix.java_option }} --mpcopts="-workers 4"
+          ./configure -v --java${{ matrix.java_option }} --mpcopts="-workers 4" --security ${{ matrix.config_options }}
           tools/scripts/show_build_config.pl
       - name: Set up msvc env
         if: runner.os == 'Windows'
@@ -70,7 +94,7 @@ jobs:
         shell: cmd
         run: |
           cd OpenDDS
-          call configure -v --java${{ matrix.java_option }} --mpcopts="-workers 4"
+          call configure -v --java${{ matrix.java_option }} --mpcopts="-workers 4" --xerces3=${{ env.VCPKG_INSTALLED_DIR }}\x64-windows --openssl=${{ env.VCPKG_INSTALLED_DIR }}\x64-windows
           tools\scripts\show_build_config.pl
       - name: Compile OpenDDS
         if: steps.cache-artifact.outputs.cache-hit != 'true' && runner.os != 'Windows'
