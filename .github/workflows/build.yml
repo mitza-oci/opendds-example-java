@@ -80,7 +80,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: OpenDDS
-          key: c02_${{ matrix.runner }}_OpenDDS_${{ env.OPENDDS_COMMIT }}${{ matrix.configuration }}
+          key: c03_${{ matrix.runner }}_OpenDDS_${{ env.OPENDDS_COMMIT }}${{ matrix.configuration }}
       - name: Configure OpenDDS
         if: steps.cache-artifact.outputs.cache-hit != 'true' && runner.os != 'Windows'
         run: |
@@ -95,7 +95,7 @@ jobs:
         shell: cmd
         run: |
           cd OpenDDS
-          call configure -v --java${{ matrix.java_option }} --mpcopts="-workers 4" --xerces3=${{ env.VCPKG_INSTALLED_DIR }}\x64-windows --openssl=${{ env.VCPKG_INSTALLED_DIR }}\x64-windows
+          call configure -v --java${{ matrix.java_option }} --mpcopts="-workers 4" --xerces3=${{ env.VCPKG_INSTALLED_DIR }}\x64-windows --openssl=${{ env.VCPKG_INSTALLED_DIR }}\x64-windows --security
           tools\scripts\show_build_config.pl
           echo set CONFIGURATION=${{ matrix.configuration }}>> setenv.cmd
       - name: Compile OpenDDS
@@ -149,8 +149,14 @@ jobs:
         if: runner.os == 'Windows'
         shell: cmd
         run: |
+          set CONFIGURATION=${{ matrix.configuration }}
           cd sub & start /b cmd /s /c run & cd ..
           waitfor /t 5 pause 2>NUL
           cd pub & call run Hello & cd ..
           waitfor /t 60 pause 2>NUL
           exit 0
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ExampleLibs_OpenDDS${{ env.OPENDDS_COMMIT }}_${{ matrix.runner }}-${{ matrix.configuration }}
+          path: idl/build/libs

@@ -11,8 +11,8 @@ mkdir libs
 xcopy /q *.jar libs
 xcopy /q *.dll libs
 
-set OPENDDS_LIBS=OpenDDS_DCPS_Java idl2jni_runtime OpenDDS_Dcps OpenDDS_Rtps OpenDDS_Rtps_Udp OpenDDS_Tcp OpenDDS_Udp
-set ACE_LIBS=TAO_Valuetype TAO_AnyTypeCode TAO ACE
+set OPENDDS_LIBS=OpenDDS_DCPS_Java idl2jni_runtime OpenDDS_Dcps OpenDDS_Rtps OpenDDS_Rtps_Udp OpenDDS_Tcp OpenDDS_Udp OpenDDS_Security
+set ACE_LIBS=TAO_Valuetype TAO_AnyTypeCode TAO ACE_XML_Utils ACE
 
 if %CONFIGURATION%==Debug set SUFFIX=d
 
