@@ -33,9 +33,11 @@ jobs:
           - runner: windows-2022
             opendds_branch: master
             configuration: Release
+            config_options: --no-debug --optimize
           - runner: windows-2022
             opendds_branch: latest-release
             configuration: Release
+            config_options: --no-debug --optimize
 
     runs-on: ${{ matrix.runner }}
 
@@ -95,7 +97,7 @@ jobs:
         shell: cmd
         run: |
           cd OpenDDS
-          call configure -v --java${{ matrix.java_option }} --mpcopts="-workers 4" --xerces3=${{ env.VCPKG_INSTALLED_DIR }}\x64-windows --openssl=${{ env.VCPKG_INSTALLED_DIR }}\x64-windows --security
+          call configure -v --java${{ matrix.java_option }} --mpcopts="-workers 4" --xerces3=${{ env.VCPKG_INSTALLED_DIR }}\x64-windows --openssl=${{ env.VCPKG_INSTALLED_DIR }}\x64-windows --security ${{ matrix.config_options }}
           tools\scripts\show_build_config.pl
           echo set CONFIGURATION=${{ matrix.configuration }}>> setenv.cmd
       - name: Compile OpenDDS
