@@ -47,11 +47,11 @@ jobs:
       - name: Get dependencies from apt
         if: runner.os == 'Linux'
         run: |
-         sudo apt-get -y install libxerces-c-dev
+          sudo apt-get -y install libxerces-c-dev
       - name: Get dependencies from homebrew
         if: runner.os == 'macOS'
         run: |
-         brew install xerces-c
+          brew install xerces-c
       - name: Prepare to use vcpkg
         if: runner.os == 'Windows'
         shell: cmd
@@ -82,7 +82,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: OpenDDS
-          key: c03_${{ matrix.runner }}_OpenDDS_${{ env.OPENDDS_COMMIT }}${{ matrix.configuration }}
+          key: c03_${{ matrix.runner }}_OpenDDS_${{ env.OPENDDS_COMMIT }}_${{ matrix.configuration }}
       - name: Configure OpenDDS
         if: steps.cache-artifact.outputs.cache-hit != 'true' && runner.os != 'Windows'
         run: |
@@ -160,5 +160,53 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: ExampleLibs_OpenDDS${{ env.OPENDDS_COMMIT }}_${{ matrix.runner }}-${{ matrix.configuration }}
+          name: ExampleLibs_OpenDDS${{ env.OPENDDS_COMMIT }}_${{ matrix.runner }}_${{ matrix.configuration }}
+          path: idl/build/libs
+      - name: Checkout OpenDDS for arm64 build
+        if: runner.os == 'macOS'
+        uses: actions/checkout@v3
+        with:
+          repository: mitza-oci/OpenDDS
+          path: arm-target/OpenDDS
+          ref: configure-macos
+          fetch-depth: 1
+      - name: Cache OpenDDS (arm64)
+        if: runner.os == 'macOS'
+        id: cache-artifact-arm64
+        uses: actions/cache@v3
+        with:
+          path: arm-target
+          key: c03_macos-arm64_OpenDDS_${{ env.OPENDDS_COMMIT }}_${{ matrix.configuration }}
+      - name: macOS Cross-compile to arm64
+        if: runner.os == 'macOS' && steps.cache-artifact-arm64.outputs.cache-hit != 'true'
+        run: |
+          PKGS="openssl xerces-c"
+          TAG=arm64_ventura
+          mkdir -p arm-target/{bin,brew-cache,arm-homebrew}
+          cd arm-target
+          ARM_TARGET=$(pwd)
+          curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C arm-homebrew
+          export HOMEBREW_CACHE=$ARM_TARGET/brew-cache
+          export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1
+          ARM_BREW=$ARM_TARGET/arm-homebrew/bin/brew
+          $ARM_BREW fetch --deps --bottle_tag=$TAG $PKGS
+          $ARM_BREW --cache --bottle-tag=$TAG $PKGS | xargs -n 1 $ARM_BREW install --ignore-dependencies --force-bottle
+          OPENSSL_ROOT=$ARM_TARGET/arm-homebrew/opt/openssl
+          XERCESC_ROOT=$ARM_TARGET/arm-homebrew/opt/xerces-c
+          cd OpenDDS
+          git clean -fxd
+          ./configure -v --mpcopts="-workers 4" --target=macos-cross --target-arch=arm64-apple-macos --java=${{ matrix.java_home }} --security --xerces3=$XERCESC_ROOT --openssl=$OPENSSL_ROOT
+          tools/scripts/show_build_config.pl
+          make -sj6
+      - name: Compile Project IDL (arm64)
+        if: runner.os == 'macOS'
+        run: |
+          . arm-target/OpenDDS/build/target/setenv.sh
+          cd idl
+          ./build-libs.sh
+      - name: Upload Artifact (arm64)
+        uses: actions/upload-artifact@v3
+        if: runner.os == 'macOS'
+        with:
+          name: ExampleLibs_OpenDDS${{ env.OPENDDS_COMMIT }}_${{ matrix.runner }}-arm64
           path: idl/build/libs
