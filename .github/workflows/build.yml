@@ -176,10 +176,11 @@ jobs:
         uses: actions/cache@v3
         with:
           path: arm-target
-          key: c03_macos-arm64_OpenDDS_${{ env.OPENDDS_COMMIT }}_${{ matrix.configuration }}
+          key: c01_macos-arm64_OpenDDS_${{ env.OPENDDS_COMMIT }}_${{ matrix.configuration }}
       - name: macOS Cross-compile to arm64
         if: runner.os == 'macOS' && steps.cache-artifact-arm64.outputs.cache-hit != 'true'
         run: |
+          HOST_DDS=$(pwd)/OpenDDS
           PKGS="openssl xerces-c"
           TAG=arm64_ventura
           mkdir -p arm-target/{bin,brew-cache,arm-homebrew}
@@ -195,13 +196,13 @@ jobs:
           XERCESC_ROOT=$ARM_TARGET/arm-homebrew/opt/xerces-c
           cd OpenDDS
           git clean -fxd
-          ./configure -v --mpcopts="-workers 4" --target=macos-cross --target-arch=arm64-apple-macos --java=${{ matrix.java_home }} --security --xerces3=$XERCESC_ROOT --openssl=$OPENSSL_ROOT
+          ./configure -v --mpcopts="-workers 4" --target=macos-cross --host-tools=$HOST_DDS --target-arch=arm64-apple-macos --java=${{ matrix.java_home }} --security --xerces3=$XERCESC_ROOT --openssl=$OPENSSL_ROOT
           tools/scripts/show_build_config.pl
           make -sj6
       - name: Compile Project IDL (arm64)
         if: runner.os == 'macOS'
         run: |
-          . arm-target/OpenDDS/build/target/setenv.sh
+          . arm-target/OpenDDS/setenv.sh
           cd idl
           ./build-libs.sh
       - name: Upload Artifact (arm64)
