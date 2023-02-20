@@ -163,26 +163,26 @@ jobs:
           name: ExampleLibs_OpenDDS${{ env.OPENDDS_COMMIT }}_${{ matrix.runner }}_${{ matrix.configuration }}
           path: idl/build/libs
       - name: Checkout OpenDDS for arm64 build
-        if: runner.os == 'macOS'
+        if: runner.os == 'macOS' && matrix.opendds_branch == 'master'
         uses: actions/checkout@v3
         with:
-          repository: mitza-oci/OpenDDS
+          repository: OpenDDS/OpenDDS
           path: arm-target/OpenDDS
-          ref: configure-macos
+          ref: ${{ env.OPENDDS_COMMIT }}
           fetch-depth: 1
       - name: Cache OpenDDS (arm64)
-        if: runner.os == 'macOS'
+        if: runner.os == 'macOS' && matrix.opendds_branch == 'master'
         id: cache-artifact-arm64
         uses: actions/cache@v3
         with:
           path: arm-target
           key: c01_macos-arm64_OpenDDS_${{ env.OPENDDS_COMMIT }}_${{ matrix.configuration }}
       - name: macOS Cross-compile to arm64
-        if: runner.os == 'macOS' && steps.cache-artifact-arm64.outputs.cache-hit != 'true'
+        if: runner.os == 'macOS' && matrix.opendds_branch == 'master' && steps.cache-artifact-arm64.outputs.cache-hit != 'true'
         run: |
           HOST_DDS=$(pwd)/OpenDDS
           PKGS="openssl xerces-c"
-          TAG=arm64_ventura
+          TAG=arm64_monterey
           mkdir -p arm-target/{bin,brew-cache,arm-homebrew}
           cd arm-target
           ARM_TARGET=$(pwd)
@@ -195,19 +195,18 @@ jobs:
           OPENSSL_ROOT=$ARM_TARGET/arm-homebrew/opt/openssl
           XERCESC_ROOT=$ARM_TARGET/arm-homebrew/opt/xerces-c
           cd OpenDDS
-          git clean -fxd
           ./configure -v --mpcopts="-workers 4" --target=macos-cross --host-tools=$HOST_DDS --target-arch=arm64-apple-macos --java=${{ matrix.java_home }} --security --xerces3=$XERCESC_ROOT --openssl=$OPENSSL_ROOT
           tools/scripts/show_build_config.pl
           make -sj6
       - name: Compile Project IDL (arm64)
-        if: runner.os == 'macOS'
+        if: runner.os == 'macOS' && matrix.opendds_branch == 'master'
         run: |
           . arm-target/OpenDDS/setenv.sh
           cd idl
           ./build-libs.sh
       - name: Upload Artifact (arm64)
         uses: actions/upload-artifact@v3
-        if: runner.os == 'macOS'
+        if: runner.os == 'macOS' && matrix.opendds_branch == 'master'
         with:
           name: ExampleLibs_OpenDDS${{ env.OPENDDS_COMMIT }}_${{ matrix.runner }}-arm64
           path: idl/build/libs
