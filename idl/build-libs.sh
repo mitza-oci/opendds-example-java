@@ -22,10 +22,12 @@ else
     SYMLINK_LIBS="OpenDDS_Rtps_Udp OpenDDS_Security OpenDDS_DCPS_Java idl2jni_runtime"
 fi
 
+cd ..
+rm -rf libs
 mkdir libs
 cd libs
-cp ../*.jar .
-cp ../*.$LIB_EXT .
+cp ../build/*.jar .
+cp ../build/*.$LIB_EXT .
 cp $DDS_ROOT/lib/*.jar .
 
 OPENDDS_LIBS="OpenDDS_DCPS_Java idl2jni_runtime OpenDDS_Dcps OpenDDS_Rtps OpenDDS_Rtps_Udp OpenDDS_Tcp OpenDDS_Udp OpenDDS_Security"
@@ -41,3 +43,9 @@ for libname in $SYMLINK_LIBS; do
     # non-versioned link to support dlopen
     ln -sf lib$libname.so.* lib$libname.so
 done
+if [ $SSL_ROOT != /usr ]; then
+    cp $SSL_ROOT/lib/lib{ssl,crypto}.*.$LIB_EXT* .
+fi
+if [ $XERCESCROOT != /usr ]; then
+    cp $XERCESCROOT/lib/libxerces-c-*.$LIB_EXT .
+fi

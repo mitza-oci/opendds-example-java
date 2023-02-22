@@ -6,4 +6,4 @@ mkdir build
 
 if defined JAVA_HOME set PREFIX=%JAVA_HOME%\bin\
 
-"%PREFIX%javac" -cp ../idl/build/libs/* -d build *.java
+"%PREFIX%javac" -cp ../idl/libs/* -d build *.java

@@ -7,4 +7,4 @@ if [ "$JAVA_HOME" != "" ]; then
     PREFIX=${JAVA_HOME}/bin/
 fi
 
-${PREFIX}javac -cp "../idl/build/libs/*" -d build *.java
+${PREFIX}javac -cp "../idl/libs/*" -d build *.java
