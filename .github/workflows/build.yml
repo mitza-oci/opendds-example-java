@@ -88,7 +88,7 @@ jobs:
         if: steps.cache-artifact.outputs.cache-hit != 'true' && runner.os != 'Windows'
         run: |
           cd OpenDDS
-          ./configure -v --java${{ matrix.java_option }} --mpcopts="-workers 4" --security ${{ matrix.config_options }}
+          ./configure -v --java${{ matrix.java_option }} --mpc:workers 4 --security ${{ matrix.config_options }}
           tools/scripts/show_build_config.pl
       - name: Set up msvc env
         if: runner.os == 'Windows'
@@ -98,7 +98,7 @@ jobs:
         shell: cmd
         run: |
           cd OpenDDS
-          call configure -v --java${{ matrix.java_option }} --mpcopts="-workers 4" --xerces3=${{ env.VCPKG_INSTALLED_DIR }}\x64-windows --openssl=${{ env.VCPKG_INSTALLED_DIR }}\x64-windows --security ${{ matrix.config_options }}
+          call configure -v --java${{ matrix.java_option }} --mpc:workers 4 --xerces3=${{ env.VCPKG_INSTALLED_DIR }}\x64-windows --openssl=${{ env.VCPKG_INSTALLED_DIR }}\x64-windows --security ${{ matrix.config_options }}
           tools\scripts\show_build_config.pl
           echo set CONFIGURATION=${{ matrix.configuration }}>> setenv.cmd
       - name: Compile OpenDDS
@@ -196,7 +196,7 @@ jobs:
           OPENSSL_ROOT=$ARM_TARGET/arm-homebrew/opt/openssl
           XERCESC_ROOT=$ARM_TARGET/arm-homebrew/opt/xerces-c
           cd OpenDDS
-          ./configure -v --mpcopts="-workers 4" --target=macos-cross --host-tools=$HOST_DDS --target-arch=arm64-apple-macos --java=${{ matrix.java_home }} --security --xerces3=$XERCESC_ROOT --openssl=$OPENSSL_ROOT
+          ./configure -v --mpc:workers 4 --target=macos-cross --host-tools=$HOST_DDS --target-arch=arm64-apple-macos --java=${{ matrix.java_home }} --security --xerces3=$XERCESC_ROOT --openssl=$OPENSSL_ROOT
           tools/scripts/show_build_config.pl
           make -sj6
       - name: Compile Project IDL (arm64)
