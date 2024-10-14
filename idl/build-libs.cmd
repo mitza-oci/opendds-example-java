@@ -15,7 +15,7 @@ xcopy /q build\*.dll libs
 
 if %CONFIGURATION%==Debug set SUFFIX=d
 
-set OPENDDS_LIBS=OpenDDS_DCPS_Java idl2jni_runtime OpenDDS_Dcps OpenDDS_Rtps OpenDDS_Rtps_Udp OpenDDS_Tcp OpenDDS_Udp OpenDDS_Security
+set OPENDDS_LIBS=OpenDDS_DCPS_Java idl2jni_runtime OpenDDS_Dcps OpenDDS_Rtps OpenDDS_Rtps_Udp OpenDDS_Tcp OpenDDS_Udp OpenDDS_Multicast OpenDDS_Security
 set ACE_LIBS=TAO_Valuetype TAO_AnyTypeCode TAO ACE_XML_Utils ACE
 set EXT_LIBS=libcrypto-3-x64.dll xerces-c_3_2%SUFFIX%.dll
 

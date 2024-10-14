@@ -30,7 +30,7 @@ cp ../build/*.jar .
 cp ../build/*.$LIB_EXT .
 cp $DDS_ROOT/lib/*.jar .
 
-OPENDDS_LIBS="OpenDDS_DCPS_Java idl2jni_runtime OpenDDS_Dcps OpenDDS_Rtps OpenDDS_Rtps_Udp OpenDDS_Tcp OpenDDS_Udp OpenDDS_Security"
+OPENDDS_LIBS="OpenDDS_DCPS_Java idl2jni_runtime OpenDDS_Dcps OpenDDS_Rtps OpenDDS_Rtps_Udp OpenDDS_Tcp OpenDDS_Udp OpenDDS_Multicast OpenDDS_Security"
 ACE_LIBS="TAO_Valuetype TAO_AnyTypeCode TAO ACE_XML_Utils ACE"
 
 for libname in $OPENDDS_LIBS; do
