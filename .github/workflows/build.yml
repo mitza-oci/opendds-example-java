@@ -22,11 +22,11 @@ jobs:
         runner:
           - windows-2022
           - ubuntu-22.04
-          - macos-12
+          - macos-13
         configuration:
           - Debug
         include:
-          - runner: macos-12
+          - runner: macos-13
             java_option: =$JAVA_HOME_17_X64
             java_home: $JAVA_HOME_17_X64
             config_options: |
@@ -44,7 +44,7 @@ jobs:
 
     steps:
       - name: Checkout this repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Get dependencies from apt
         if: runner.os == 'Linux'
         run: |
@@ -62,13 +62,13 @@ jobs:
           echo VCPKG_INSTALLED_DIR=${{ github.workspace }}\vcpkg\installed>> %GITHUB_ENV%
       - name: Get dependencies from vcpkg
         if: runner.os == 'Windows'
-        uses: lukka/run-vcpkg@v10
+        uses: lukka/run-vcpkg@v11
         with:
           vcpkgDirectory: '${{ github.workspace }}/vcpkg'
           vcpkgGitCommitId: c82f74667287d3dc386bce81e44964370c91a289
           runVcpkgInstall: true
       - name: Checkout OpenDDS
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: OpenDDS/OpenDDS
           path: OpenDDS
@@ -80,7 +80,7 @@ jobs:
           echo OPENDDS_COMMIT=$(cd OpenDDS; git rev-parse HEAD) >> $GITHUB_ENV
       - name: Cache OpenDDS
         id: cache-artifact
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: OpenDDS
           key: c03_${{ matrix.runner }}_OpenDDS_${{ env.OPENDDS_COMMIT }}_${{ matrix.configuration }}
@@ -159,13 +159,13 @@ jobs:
           waitfor /t 60 pause 2>NUL
           exit 0
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ExampleLibs_OpenDDS${{ env.OPENDDS_COMMIT }}_${{ matrix.runner }}_${{ matrix.configuration }}
           path: idl/build/libs
       - name: Checkout OpenDDS for arm64 build
         if: runner.os == 'macOS' && matrix.opendds_branch == 'master'
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: OpenDDS/OpenDDS
           path: arm-target/OpenDDS
@@ -174,7 +174,7 @@ jobs:
       - name: Cache OpenDDS (arm64)
         if: runner.os == 'macOS' && matrix.opendds_branch == 'master'
         id: cache-artifact-arm64
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: arm-target
           key: c01_macos-arm64_OpenDDS_${{ env.OPENDDS_COMMIT }}_${{ matrix.configuration }}
@@ -206,7 +206,7 @@ jobs:
           cd idl
           ./build-libs.sh
       - name: Upload Artifact (arm64)
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: runner.os == 'macOS' && matrix.opendds_branch == 'master'
         with:
           name: ExampleLibs_OpenDDS${{ env.OPENDDS_COMMIT }}_${{ matrix.runner }}-arm64
