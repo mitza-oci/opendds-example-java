@@ -83,7 +83,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: OpenDDS
-          key: c03_${{ matrix.runner }}_OpenDDS_${{ env.OPENDDS_COMMIT }}_${{ matrix.configuration }}
+          key: c04_${{ matrix.runner }}_OpenDDS_${{ env.OPENDDS_COMMIT }}_${{ matrix.configuration }}
       - name: Configure OpenDDS
         if: steps.cache-artifact.outputs.cache-hit != 'true' && runner.os != 'Windows'
         run: |
@@ -183,7 +183,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: arm-target
-          key: c01_macos-arm64_OpenDDS_${{ env.OPENDDS_COMMIT }}_${{ matrix.configuration }}
+          key: c04_macos-arm64_OpenDDS_${{ env.OPENDDS_COMMIT }}_${{ matrix.configuration }}
       - name: macOS Cross-compile to arm64
         if: runner.os == 'macOS' && matrix.opendds_branch == 'master' && steps.cache-artifact-arm64.outputs.cache-hit != 'true'
         run: |
