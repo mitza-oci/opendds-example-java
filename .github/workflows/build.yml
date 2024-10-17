@@ -101,6 +101,12 @@ jobs:
           call configure -v --java${{ matrix.java_option }} --mpc:workers 4 --xerces3=${{ env.VCPKG_INSTALLED_DIR }}\x64-windows --openssl=${{ env.VCPKG_INSTALLED_DIR }}\x64-windows --security ${{ matrix.config_options }}
           tools\scripts\show_build_config.pl
           echo set CONFIGURATION=${{ matrix.configuration }}>> setenv.cmd
+      - name: GCC Problem Matcher
+        uses: ammaraskar/gcc-problem-matcher@0.3.0
+        if: runner.os != 'Windows'
+      - name: MSVC Problem Matcher
+        uses: ammaraskar/msvc-problem-matcher@0.3.0
+        if: runner.os == 'Windows'
       - name: Compile OpenDDS
         if: steps.cache-artifact.outputs.cache-hit != 'true' && runner.os != 'Windows'
         run: |
