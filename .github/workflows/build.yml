@@ -168,7 +168,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ExampleLibs_OpenDDS${{ env.OPENDDS_COMMIT }}_${{ matrix.runner }}_${{ matrix.configuration }}
-          path: idl/build/libs
+          path: idl/libs
       - name: Checkout OpenDDS for arm64 build
         if: runner.os == 'macOS' && matrix.opendds_branch == 'master'
         uses: actions/checkout@v4
@@ -216,4 +216,4 @@ jobs:
         if: runner.os == 'macOS' && matrix.opendds_branch == 'master'
         with:
           name: ExampleLibs_OpenDDS${{ env.OPENDDS_COMMIT }}_${{ matrix.runner }}-arm64
-          path: idl/build/libs
+          path: idl/libs
