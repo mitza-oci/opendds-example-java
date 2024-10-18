@@ -189,7 +189,7 @@ jobs:
         run: |
           HOST_DDS=$(pwd)/OpenDDS
           PKGS="openssl xerces-c"
-          TAG=arm64_monterey
+          TAG=arm64_ventura
           mkdir -p arm-target/{bin,brew-cache,arm-homebrew}
           cd arm-target
           ARM_TARGET=$(pwd)
