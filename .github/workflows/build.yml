@@ -196,6 +196,7 @@ jobs:
           curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C arm-homebrew
           export HOMEBREW_CACHE=$ARM_TARGET/brew-cache
           export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1
+          export HOMEBREW_DEVELOPER=1
           ARM_BREW=$ARM_TARGET/arm-homebrew/bin/brew
           $ARM_BREW fetch --deps --bottle_tag=$TAG $PKGS
           $ARM_BREW --cache --bottle-tag=$TAG $PKGS | xargs -n 1 $ARM_BREW install --ignore-dependencies --force-bottle
